@@ -1,7 +1,6 @@
 # web.whatsapp.com SPA Resources
 
-
-
+    Flattened and beautified.
 
 Saved using:
 
