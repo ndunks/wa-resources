@@ -1,0 +1,21 @@
+{
+  "name": "wa-resources",
+  "version": "1.0.0",
+  "description": "Flattened and beautified.",
+  "main": "inspector.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ndunks/wa-resources.git"
+  },
+  "keywords": [],
+  "type": "module",
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ndunks/wa-resources/issues"
+  },
+  "homepage": "https://github.com/ndunks/wa-resources#readme"
+}
