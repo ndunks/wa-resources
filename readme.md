@@ -118,3 +118,80 @@ function T(b, c, e, g, h, i, l) {
     __rl_stub.push(arguments);
   });
 ```
+
+### Link handling
+
+White listed param name
+
+``` js
+["utm_source", "utm_campaign", "text", "phone", "data", "source", "context", "icebreaker", "source_url", "type", "token"];
+```
+
+The different between normal web wa vs:
+https://web.whatsapp.com/send/?phone=62812345****&text=Halo+saya+tertarik+dengan+produk+Anda&type=phone_number&app_absent=0
+
+```js
+["LinkshimHandlerConfig", [], {
+                                "supports_meta_referrer": true,
+                                "default_meta_referrer_policy": "origin-when-crossorigin",
+                                "switched_meta_referrer_policy": "origin",
+                                "non_linkshim_lnfb_mode": null,
+                                "link_react_default_hash": "AT2QgmupxkdsMQ-onTHkOKFvgbOIYyhLdHmfwqdO2EDG_j6xAEPjqdBlvMJcu098qbAScKsA7x0RExdo75XwzfCER8dcr9GKBIhpsNXBXO09EAr5JzA",
+                                "untrusted_link_default_hash": "AT0uhXC0avX3fgHknr_W1PTDI9ayo2jWJZPgGlExxz7j-9TXM1NJtuoPC2kOOIV7vZECdhmfBRARysLLbSqMm96lVLotRa7rA_N2Mk3zbvGHG6sjBrU",
+                                "linkshim_host": "l.facebook.com",
+                                "linkshim_path": "\/l.php",
+                                "linkshim_enc_param": "h",
+                                "linkshim_url_param": "u",
+                                "use_rel_no_opener": true,
+                                "use_rel_no_referrer": true,
+                                "always_use_https": true,
+                                "onion_always_shim": true,
+                                "middle_click_requires_event": true,
+                                "www_safe_js_mode": "asynclazy",
+                                "m_safe_js_mode": "MLynx_asynclazy",
+                                "ghl_param_link_shim": false,
+                                "click_ids": null,
+                                "is_linkshim_supported": false,
+                                "current_domain": "whatsapp.com",
+                                "blocklisted_domains": ["ad.doubleclick.net",
+                                    "ads-encryption-url-example.com", "bs.serving-sys.com",
+                                    "ad.atdmt.com", "adform.net", "ad13.adfarm1.adition.com",
+                                    "ilovemyfreedoms.com", "secure.adnxs.com"
+                                ],
+                                "is_mobile_device": false
+                            }, 27],
+```
+
+Normal have same code, but in different order
+
+``` js
+["LinkshimHandlerConfig", [], {
+                                "supports_meta_referrer": true,
+                                "default_meta_referrer_policy": "origin-when-crossorigin",
+                                "switched_meta_referrer_policy": "origin",
+                                "non_linkshim_lnfb_mode": null,
+                                "link_react_default_hash": "AT2sY9j4h0KRGnjmm-_Mb-X73t7dTudSCRHKGJfX2UH-hNRrNEbdZ-aJ-vtqBLi9BbVJ8SJachbQr3nLyGI-2X2ilqwd6aLsYwAOdfYiiygK1fgj4dU",
+                                "untrusted_link_default_hash": "AT3tbwGuUhrwz3JF4Lw4KJ1ruMjXNXpQj4FB6WiQOtkhJqbbVBOYL-p7rij6tWHlE_DVjQnFwo3uCgbuSAyB7XP9AL50RhUcKVqP9OfvMlh3UeaUhss",
+                                "linkshim_host": "l.facebook.com",
+                                "linkshim_path": "\/l.php",
+                                "linkshim_enc_param": "h",
+                                "linkshim_url_param": "u",
+                                "use_rel_no_opener": true,
+                                "use_rel_no_referrer": true,
+                                "always_use_https": true,
+                                "onion_always_shim": true,
+                                "middle_click_requires_event": true,
+                                "www_safe_js_mode": "asynclazy",
+                                "m_safe_js_mode": "MLynx_asynclazy",
+                                "ghl_param_link_shim": false,
+                                "click_ids": null,
+                                "is_linkshim_supported": false,
+                                "current_domain": "whatsapp.com",
+                                "blocklisted_domains": ["ad.doubleclick.net",
+                                    "ads-encryption-url-example.com", "bs.serving-sys.com",
+                                    "ad.atdmt.com", "adform.net", "ad13.adfarm1.adition.com",
+                                    "ilovemyfreedoms.com", "secure.adnxs.com"
+                                ],
+                                "is_mobile_device": false
+                            }, 27],
+```

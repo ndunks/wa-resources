@@ -149,55 +149,58 @@ __d(
             return !d("WAWebCmd").Cmd.isOfflineDeliveryEnd;
         }
         var t = !1;
-        function a(a, e) {
-            d("WALogger").LOG(r(), a.id.toLogString(), e.type, e.subtype);
+        function a(chat, msg) {
+            d("WALogger").LOG(r(), chat.id.toLogString(), msg.type, msg.subtype);
             if (
-                d("WAWebChatGetters").getIsNewsletter(a) &&
+                d("WAWebChatGetters").getIsNewsletter(chat) &&
                 !d("WAWebNewsletterGatingUtils").isNewsletterEnabled()
             )
                 return (h || (h = b("Promise"))).resolve();
-            if (!e) return (h || (h = b("Promise"))).resolve();
+
+            if (!msg) return (h || (h = b("Promise"))).resolve();
+
             var f = (h || (h = b("Promise"))).resolve();
-            d("WAWebMsgGetters").getIsSentByMe(e) &&
-                !a.notSpam &&
-                !d("WAWebChatGetters").getIsNewsletter(a) &&
-                (f = d("WAWebSendSpamChatAction").sendNotSpam(a, !1));
-            return d("WAWebFrontendMsgGetters").getEventType(e) ===
+            d("WAWebMsgGetters").getIsSentByMe(msg) &&
+                !chat.notSpam &&
+                !d("WAWebChatGetters").getIsNewsletter(chat) &&
+                (f = d("WAWebSendSpamChatAction").sendNotSpam(chat, !1));
+
+            return d("WAWebFrontendMsgGetters").getEventType(msg) ===
                 d("WAWebCommonMsgUtils").EventType.IGNORE
                 ? (h || (h = b("Promise"))).resolve()
                 : f
                     .then(
                         b("asyncToGeneratorRuntime").asyncToGenerator(function* () {
                             var b = {};
-                            a.promises.updateSortTime &&
-                                a.promises.updateSortTime.abortController.abort();
-                            d("WAWebMsgGetters").getIsSentByMeFromWeb(e) &&
-                                a.archive &&
+                            chat.promises.updateSortTime &&
+                                chat.promises.updateSortTime.abortController.abort();
+                            d("WAWebMsgGetters").getIsSentByMeFromWeb(msg) &&
+                                chat.archive &&
                                 d("WAWebSetArchiveChatActionUtils").shouldUnarchiveChat(
-                                    d("WAWebMsgGetters").getIsSentByMe(e)
+                                    d("WAWebMsgGetters").getIsSentByMe(msg)
                                 ) &&
                                 (d("WALogger").DEV(q()), (b.archive = !1));
-                            a.promises.setArchive &&
-                                a.promises.setArchive.abortController.abort();
-                            !d("WAWebChatGetters").getIsNewsletter(a) &&
-                                e.subtype !==
+                            chat.promises.setArchive &&
+                                chat.promises.setArchive.abortController.abort();
+                            !d("WAWebChatGetters").getIsNewsletter(chat) &&
+                                msg.subtype !==
                                 d("WAWebBotGenTypingIndicatorMsg")
                                     .BOT_TYPING_PLACEHOLDER_MSG_SUBTYPE &&
-                                (!d("WAWebMsgGetters").getIsSentByMe(e)
+                                (!d("WAWebMsgGetters").getIsSentByMe(msg)
                                     ? c("WAWebChangePresenceHandlerAction")(
-                                        { id: a.id, participant: e.author, type: "idle" },
+                                        { id: chat.id, participant: msg.author, type: "idle" },
                                         !1
                                     )
-                                    : (a.markedUnread = !1));
+                                    : (chat.markedUnread = !1));
                             d("WALogger").LOG(p());
                             try {
-                                yield d("WAWebDBUpdateChatTable").updateChatTable(a.id, b);
+                                yield d("WAWebDBUpdateChatTable").updateChatTable(chat.id, b);
                             } catch (b) {
                                 var f = yield d("WAWebSchemaChat")
                                     .getChatTable()
-                                    .get(a.id.toString());
+                                    .get(chat.id.toString());
                                 d("WALogger")
-                                    .ERROR(o(), a.id.toLogString(), f != null, b)
+                                    .ERROR(o(), chat.id.toLogString(), f != null, b)
                                     .sendLogs("handle-new-msg-cannot-update-chat");
                                 throw b;
                             }
@@ -207,68 +210,68 @@ __d(
                                     s() &&
                                     (d("WAWebViewModeUtils").isViewModeVisibleInSurface(
                                         d("WAWebViewMode.flow").ViewModeSurface.CHAT,
-                                        e.viewMode
+                                        msg.viewMode
                                     ) ||
                                         ((b = d("WAWebInvisiblePlaceholderViewModeProcessor")
                                             .InvisiblePlaceholderViewModeProcessor
                                             .compatibleMessageTypes) == null
                                             ? void 0
-                                            : b.includes(e.type)))
+                                            : b.includes(msg.type)))
                                 )
                                     d("WALogger").LOG(n()),
-                                        (f.t = e.t),
-                                        (d("WAWebFrontendMsgGetters").getEventType(e) ===
+                                        (f.t = msg.t),
+                                        (d("WAWebFrontendMsgGetters").getEventType(msg) ===
                                             d("WAWebCommonMsgUtils").EventType.AMBIENT ||
-                                            d("WAWebFrontendMsgGetters").getEventType(e) ===
+                                            d("WAWebFrontendMsgGetters").getEventType(msg) ===
                                             d("WAWebCommonMsgUtils").EventType.DEFAULT) &&
-                                        !e.id.fromMe &&
-                                        ((f.unreadCount = a.unreadCount + 1 || 1),
-                                            a.activeUnreadCount > 0 &&
-                                            (f.activeUnreadCount = a.activeUnreadCount + 1));
+                                        !msg.id.fromMe &&
+                                        ((f.unreadCount = chat.unreadCount + 1 || 1),
+                                            chat.activeUnreadCount > 0 &&
+                                            (f.activeUnreadCount = chat.activeUnreadCount + 1));
                                 else {
-                                    b = yield d("WAWebApiChat").getChatMeta(a.id);
+                                    b = yield d("WAWebApiChat").getChatMeta(chat.id);
                                     var g = b.unreadCount;
                                     b = b.timestamp;
                                     f.unreadCount = g;
                                     f.t = b;
-                                    a.activeUnreadCount > 0 &&
+                                    chat.activeUnreadCount > 0 &&
                                         (f.activeUnreadCount =
-                                            a.activeUnreadCount +
+                                            chat.activeUnreadCount +
                                             Number(
                                                 d("WAWebViewModeUtils").isViewModeVisibleInSurface(
                                                     d("WAWebViewMode.flow").ViewModeSurface.CHAT,
-                                                    e.viewMode
+                                                    msg.viewMode
                                                 )
                                             ));
                                 }
                                 f.unreadDividerOffset = 0;
                             } catch (c) {
-                                d("WALogger").ERROR(m(), a.id.toLogString(), c.stack);
+                                d("WALogger").ERROR(m(), chat.id.toLogString(), c.stack);
                                 if (!t) {
                                     var h;
                                     t = !0;
                                     g = yield d("WAWebSchemaChat")
                                         .getChatTable()
-                                        .get(a.id.toString());
-                                    b = a.accountLid
+                                        .get(chat.id.toString());
+                                    b = chat.accountLid
                                         ? yield d("WAWebSchemaChat")
                                             .getChatTable()
                                             .get(
-                                                (b = a.accountLid) == null ? void 0 : b.toString()
+                                                (b = chat.accountLid) == null ? void 0 : b.toString()
                                             )
                                         : null;
                                     d("WAWebLidMigrationUtils").logLidMetadata();
                                     d("WALogger")
                                         .LOG(
                                             l(),
-                                            a.id.toLogString(),
-                                            (h = a.accountLid) == null ? void 0 : h.toLogString(),
+                                            chat.id.toLogString(),
+                                            (h = chat.accountLid) == null ? void 0 : h.toLogString(),
                                             g != null,
                                             b != null
                                         )
                                         .tags("missing-lid");
                                     d("WALogger")
-                                        .ERROR(k(), a.id.toLogString(), c.stack)
+                                        .ERROR(k(), chat.id.toLogString(), c.stack)
                                         .sendLogs(
                                             "onNewMsg: unable to find metadata from chat table"
                                         );
@@ -278,53 +281,53 @@ __d(
                         })
                     )
                     .then(function (b) {
-                        a.set(b);
-                        e.ctwaContext != null &&
+                        chat.set(b);
+                        msg.ctwaContext != null &&
                             (d(
                                 "WAWebCommonCTWAConsumerTransparency"
                             ).handleConsumerTransparencyForNewMsg(
-                                a,
-                                e.ctwaContext.conversionData,
-                                e.ctwaContext.conversionSource
+                                chat,
+                                msg.ctwaContext.conversionData,
+                                msg.ctwaContext.conversionSource
                             ),
                                 d(
                                     "WAWebCommonCTWALogging"
-                                ).maybeSetCtwaMessageReceivedInUserPreferenceStore(e));
-                        var f = c("WAWebConversionTupleCollection").get(a.id);
+                                ).maybeSetCtwaMessageReceivedInUserPreferenceStore(msg));
+                        var f = c("WAWebConversionTupleCollection").get(chat.id);
                         if (f) f.timestamp = d("WATimeUtils").unixTime();
-                        else if (e.ctwaContext != null) {
-                            f = e.ctwaContext;
+                        else if (msg.ctwaContext != null) {
+                            f = msg.ctwaContext;
                             var g = f.conversionSource;
                             f = f.conversionData;
                             c("WAWebConversionTupleCollection").add(
                                 {
                                     conversionSource: g,
                                     conversionData: f,
-                                    id: a.id,
+                                    id: chat.id,
                                     timestamp: d("WATimeUtils").unixTime(),
                                 },
                                 { merge: !0 }
                             );
                         }
                         g = d("WAWebUserPrefsMeUser").getMeUser();
-                        e.type === "gp2" &&
-                            (e.subtype === "add" || e.subtype === "create") &&
-                            a
+                        msg.type === "gp2" &&
+                            (msg.subtype === "add" || msg.subtype === "create") &&
+                            chat
                                 .getGroupMetadataCollection()
-                                .trigger("group_participant_change_" + g.toString(), a.id);
-                        if (!d("WAWebMsgGetters").getIsSentByMe(e)) {
-                            switch (d("WAWebFrontendMsgGetters").getEventType(e)) {
+                                .trigger("group_participant_change_" + g.toString(), chat.id);
+                        if (!d("WAWebMsgGetters").getIsSentByMe(msg)) {
+                            switch (d("WAWebFrontendMsgGetters").getEventType(msg)) {
                                 case d("WAWebCommonMsgUtils").EventType.DEFAULT:
                                 case d("WAWebCommonMsgUtils").EventType.AMBIENT:
-                                    d("WAWebFrontendMsgGetters").getEventType(e) ===
+                                    d("WAWebFrontendMsgGetters").getEventType(msg) ===
                                         d("WAWebCommonMsgUtils").EventType.DEFAULT &&
-                                        d("WAWebCmd").Cmd.alertNewMsg(e);
-                                    a.msgs.length <
+                                        d("WAWebCmd").Cmd.alertNewMsg(msg);
+                                    chat.msgs.length <
                                         d("WAWebCollectionConstants").MSG_PRELOAD_THRESHOLD &&
-                                        !d("WAWebChatGetters").getIsNewsletter(a) &&
+                                        !d("WAWebChatGetters").getIsNewsletter(chat) &&
                                         d("WAWebChatLoadMessages")
                                             .loadEarlierMsgs(
-                                                a,
+                                                chat,
                                                 void 0,
                                                 d("WAWebWamEnumWebcQueryTriggerType")
                                                     .WEBC_QUERY_TRIGGER_TYPE.NEW_MESSAGE_PREFETCH
@@ -340,54 +343,54 @@ __d(
                                         });
                                     break;
                                 case d("WAWebCommonMsgUtils").EventType.NOTEWORTHY:
-                                    ((e.type === d("WAWebMsgType").MSG_TYPE.CALL_LOG &&
+                                    ((msg.type === d("WAWebMsgType").MSG_TYPE.CALL_LOG &&
                                         !c("WAWebEnvironment").isWindows) ||
-                                        e.subtype === "sender_invite") &&
-                                        d("WAWebCmd").Cmd.alertNewMsg(e);
+                                        msg.subtype === "sender_invite") &&
+                                        d("WAWebCmd").Cmd.alertNewMsg(msg);
                                     break;
                                 case d("WAWebCommonMsgUtils").EventType.SIGNIFICANT:
                                     if (
-                                        e.type === "gp2" &&
-                                        e.subtype === "add" &&
-                                        d("WAWebUserPrefsMeUser").isMeAccount(e.recipients[0]) &&
-                                        !a.contact.name
+                                        msg.type === "gp2" &&
+                                        msg.subtype === "add" &&
+                                        d("WAWebUserPrefsMeUser").isMeAccount(msg.recipients[0]) &&
+                                        !chat.contact.name
                                     )
                                         return;
-                                    d("WAWebCmd").Cmd.alertNewMsg(e);
-                                    f = a.getGroupMetadataCollection();
-                                    f.trigger("group_participant_change_" + g.toString(), a.id);
+                                    d("WAWebCmd").Cmd.alertNewMsg(msg);
+                                    f = chat.getGroupMetadataCollection();
+                                    f.trigger("group_participant_change_" + g.toString(), chat.id);
                                     break;
                                 default:
                                     break;
                             }
-                            f = e.mediaData;
+                            f = msg.mediaData;
                             f &&
                                 (f.type === "image" || f.type === "video") &&
-                                d("WAWebCmd").Cmd.newMediaMsg(e);
+                                d("WAWebCmd").Cmd.newMediaMsg(msg);
                             b.unreadCount != null &&
                                 b.unreadCount > 0 &&
                                 !s() &&
                                 d("WAWebHandleMsgReceiptCommon").processOrphanPeerReceipt(
-                                    e.id
+                                    msg.id
                                 );
-                            if (d("WAWebMsgGetters").getIsImportantMessage(e)) {
+                            if (d("WAWebMsgGetters").getIsImportantMessage(msg)) {
                                 g = new (c("WAWebUnreadMentionModel"))({
-                                    id: e.id.toString(),
-                                    timestamp: e.t,
+                                    id: msg.id.toString(),
+                                    timestamp: msg.t,
                                 });
-                                (f = a.groupMetadata) == null
+                                (f = chat.groupMetadata) == null
                                     ? void 0
                                     : f.unreadMentionMetadata.addUnreadMentions(
                                         g,
                                         d("WAWebGroupUnreadMessageType").UnreadMessageType
                                             .NEW_MESSAGE
                                     );
-                                if (a.archiveAtMentionViewedInDrawer) {
+                                if (chat.archiveAtMentionViewedInDrawer) {
                                     b = new Map();
-                                    b.set(a.id.toString(), !1);
+                                    b.set(chat.id.toString(), !1);
                                     d("WALogger").LOG(i());
                                     d("WAWebApiChat").updateChatArchiveDrawer(b);
-                                    a.archiveAtMentionViewedInDrawer = !1;
+                                    chat.archiveAtMentionViewedInDrawer = !1;
                                 }
                             }
                         }
