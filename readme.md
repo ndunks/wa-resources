@@ -6,6 +6,31 @@ Saved using: [Chrome Extension](https://chromewebstore.google.com/detail/save-al
 
 
 ## Info
+
+
+EntryPoint: [WWz0UNjwPdh.js](static.whatsapp.net/rsrc.php/WWz0UNjwPdh.js)
+
+AMD module: [amd-module.js](amd-module.js)
+Get module dependencies:
+``` js
+moduleStats = require('__getModuleTimeDetails')()
+```
+
+Export it
+``` js
+
+const downloadJson = (obj, filename = 'modules.json') => {
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(obj, null, 2));
+  const downloadAnchorNode = document.createElement('a');
+  downloadAnchorNode.setAttribute("href", dataStr);
+  downloadAnchorNode.setAttribute("download", filename);
+  document.body.appendChild(downloadAnchorNode); // Required for Firefox
+  downloadAnchorNode.click();
+  downloadAnchorNode.remove(); // Clean up
+};
+downloadJson(require('__getModuleTimeDetails')())
+```
+
 ### CMD
 
 [static.whatsapp.net/rsrc.php/DO5qzUlBjxh.js](https://gitkraken.dev/link/dnNjb2RlOi8vZWFtb2Rpby5naXRsZW5zL2xpbmsvci80ZTdiZjJiMjJmY2JkMTE5ZjhhZWU3NWI3YjVjNmJlNzAxMGRjMmFlL2Yvc3RhdGljLndoYXRzYXBwLm5ldC9yc3JjLnBocC9ETzVxelVsQmp4aC5qcz91cmw9Z2l0JTQwZ2l0aHViLmNvbSUzQW5kdW5rcyUyRndhLXJlc291cmNlcy5naXQmbGluZXM9MTE2MjM1?origin=gitlens)

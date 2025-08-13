@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Modules Graph Viewer</title>
+  <style>
+    html, body, #cy { width: 100%; height: 100%; margin: 0; padding: 0; }
+    #controls {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 5px;
+      border-radius: 4px;
+      font-family: sans-serif;
+    }
+    #search { width: 200px; }
+  </style>
+  <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
+</head>
+<body>
+<div id="controls">
+  <input type="text" id="search" placeholder="Search module..." />
+  <button id="fit">Fit All</button>
+</div>
+<div id="cy"></div>
+<script>
+fetch('modules.json')
+  .then(res => res.json())
+  .then(data => {
+    const nodes = Object.keys(data).map(id => ({ data: { id } }));
+    const edges = [];
+    for (const [id, mod] of Object.entries(data)) {
+      (mod.dependencies || []).forEach(dep => {
+        if (data[dep]) edges.push({ data: { source: id, target: dep } });
+      });
+    }
+
+    const cy = cytoscape({
+      container: document.getElementById('cy'),
+      elements: nodes,
+      layout: { name: 'grid', fit: true, animate: false },
+      style: [
+        { selector: 'node', style: { 'background-color': '#0074D9', 'width': 4, 'height': 4 } },
+        { selector: 'edge', style: { 'width': 0.2, 'line-color': '#ccc', 'opacity': 0.3 } },
+        { selector: '.highlighted', style: { 'background-color': '#FF4136', 'width': 20, 'height': 20, 'label': 'data(id)', 'font-size': 12 } },
+        { selector: '.neighbor', style: { 'background-color': '#2ECC40', 'width': 10, 'height': 10 } }
+      ],
+      textureOnViewport: true,
+      wheelSensitivity: 0.2,
+    });
+
+    // Progressive edge loading
+    let i = 0;
+    function addEdgesChunk() {
+      const chunk = edges.slice(i, i + 2000);
+      cy.add(chunk);
+      i += 2000;
+      if (i < edges.length) requestAnimationFrame(addEdgesChunk);
+    }
+    addEdgesChunk();
+
+    // Click-to-highlight dependencies
+    cy.on('tap', 'node', function (evt) {
+      const node = evt.target;
+      cy.elements().removeClass('highlighted neighbor');
+
+      node.addClass('highlighted');
+      node.outgoers('node').addClass('neighbor');
+      node.incomers('node').addClass('neighbor');
+
+      const neighborhood = node.closedNeighborhood();
+      cy.fit(neighborhood, 100);
+    });
+
+    // Search feature
+    document.getElementById('search').addEventListener('input', e => {
+      const query = e.target.value.trim();
+      cy.elements().removeClass('highlighted neighbor');
+      if (query) {
+        const match = cy.$id(query);
+        if (match.nonempty()) {
+          match.addClass('highlighted');
+          match.outgoers('node').addClass('neighbor');
+          match.incomers('node').addClass('neighbor');
+          cy.fit(match.closedNeighborhood(), 100);
+        }
+      }
+    });
+
+    // Fit all button
+    document.getElementById('fit').addEventListener('click', () => cy.fit());
+  });
+</script>
+</body>
+</html>

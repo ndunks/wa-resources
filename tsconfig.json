@@ -1,5 +1,5 @@
 {
-    "exclude": ["static.whatsapp.net/btmanifest","static.whatsapp.net/rsrc-translations.php"],
+    "exclude": ["static.whatsapp.net/btmanifest","static.whatsapp.net"],
     "compilerOptions": {
         "target": "es2024",
         "module": "commonjs",
